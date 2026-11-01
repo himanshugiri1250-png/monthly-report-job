@@ -1,127 +1,322 @@
+
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Work Schedule Pro</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #f0f2f5; padding: 15px; margin: 0; }
-        .container { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 450px; margin: auto; }
-        
-        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .nav-btn { background: #007bff; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; }
-        
-        h2 { color: #2c3e50; margin: 0; font-size: 1.2rem; }
-        .counter-box { background: #e74c3c; color: white; padding: 10px; border-radius: 10px; margin: 15px 0; font-weight: bold; }
-        
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-        .day-name { font-weight: bold; color: #7f8c8d; font-size: 0.8rem; padding-bottom: 5px; }
-        
-        .day { aspect-ratio: 1/1; background: #fff; border: 1px solid #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 600; cursor: pointer; position: relative; }
-        .day.absent::after { content: "❌"; font-size: 1.1rem; position: absolute; }
-        .day.absent { background: #fdeaea; border-color: #fab1a0; }
-        .day.empty { border: none; cursor: default; }
-
-        .btn-reset { margin-top: 20px; padding: 10px; background: #95a5a6; color: white; border: none; border-radius: 8px; width: 100%; cursor: pointer; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Work Schedule Pro</title>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+    background: #f0f2f5;
+    padding: 15px;
+    margin: 0;
+  }
+  .container {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    max-width: 450px;
+    margin: auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+  .nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 8px;
+  }
+  .nav-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  h2 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.2rem;
+  }
+  .counter-box {
+    background: #e74c3c;
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 15px 0;
+    font-weight: bold;
+  }
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+  }
+  .day-name {
+    font-weight: bold;
+    color: #7f8c8d;
+    font-size: 13px;
+    padding: 5px 0;
+  }
+  .day {
+    min-width: 0;
+    min-height: 54px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    cursor: pointer;
+    padding: 3px 1px;
+    box-sizing: border-box;
+  }
+  .day-number {
+    font-weight: bold;
+    font-size: 14px;
+  }
+  .day-status {
+    font-size: 9px;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+  .day.absent {
+    background: #ffe5e5;
+    border-color: #e74c3c;
+  }
+  .day.half {
+    background: #fff4d6;
+    border-color: #e0a000;
+  }
+  .day.empty {
+    background: transparent;
+    border: none;
+    cursor: default;
+  }
+  .btn-reset {
+    margin-top: 20px;
+    padding: 10px;
+    background: #95a5a6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    width: 100%;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .help {
+    font-size: 12px;
+    color: #666;
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+</style>
 </head>
 <body>
 
 <div class="container">
-    <div class="nav-header">
-        <button class="nav-btn" onclick="changeMonth(-1)">←</button>
-        <h2 id="monthDisplay">Month Year</h2>
-        <button class="nav-btn" onclick="changeMonth(1)">→</button>
-    </div>
-    
-    <div class="counter-box">Total Absents: <span id="totalCount">0</span></div>
+  <div class="nav-header">
+    <button class="nav-btn" onclick="changeMonth(-1)">❮</button>
+    <h2 id="monthDisplay">Month Year</h2>
+    <button class="nav-btn" onclick="changeMonth(1)">❯</button>
+  </div>
 
-    <div class="calendar-grid" id="calendar"></div>
+  <div class="counter-box">
+    Total Absents: <span id="totalCount">0</span>
+  </div>
 
-    <button class="btn-reset" onclick="clearMonthData()">Clear This Month</button>
+  <div class="calendar-grid" id="calendar"></div>
+
+  <button class="btn-reset" onclick="clearMonthData()">Clear This Month</button>
+
+  <div class="help">
+    किसी तारीख पर क्लिक करके Biju या Raju की छुट्टी दर्ज करें।
+    <br>आधा काम (Half Duty) Total Absents में नहीं गिना जाएगा।
+  </div>
 </div>
 
 <script>
-    let currentDate = new Date(); // Aaj ki date
-    const calendar = document.getElementById('calendar');
-    const monthDisplay = document.getElementById('monthDisplay');
-    const totalCountLabel = document.getElementById('totalCount');
+  let currentDate = new Date();
+  const calendar = document.getElementById('calendar');
+  const monthDisplay = document.getElementById('monthDisplay');
+  const totalCountLabel = document.getElementById('totalCount');
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  function getStorageKey() {
+    return `absent_${currentDate.getFullYear()}_${currentDate.getMonth()}`;
+  }
 
-    function renderCalendar() {
-        calendar.innerHTML = "";
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
+  function getAttendance() {
+    const key = getStorageKey();
+    let data = {};
 
-        // Month and Year Title
-        const monthName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate);
-        monthDisplay.innerText = `${monthName} ${year}`;
-
-        // Add Day Headers (Sun, Mon...)
-        dayNames.forEach(name => {
-            const div = document.createElement('div');
-            div.classList.add('day-name');
-            div.innerText = name;
-            calendar.appendChild(div);
-        });
-
-        const firstDayIndex = new Date(year, month, 1).getDay();
-        const lastDay = new Date(year, month + 1, 0).getDate();
-        
-        // LocalStorage Key (Har mahine ke liye alag data)
-        const storageKey = `absent_${year}_${month}`;
-        let attendance = JSON.parse(localStorage.getItem(storageKey)) || {};
-
-        // Empty spaces for previous month's days
-        for (let x = 0; x < firstDayIndex; x++) {
-            const emptyDiv = document.createElement('div');
-            emptyDiv.classList.add('day', 'empty');
-            calendar.appendChild(emptyDiv);
-        }
-
-        // Real Days of the month
-        for (let i = 1; i <= lastDay; i++) {
-            const daySquare = document.createElement('div');
-            daySquare.classList.add('day');
-            daySquare.innerText = i;
-
-            if (attendance[i]) daySquare.classList.add('absent');
-
-            daySquare.onclick = () => {
-                if (attendance[i]) {
-                    delete attendance[i];
-                    daySquare.classList.remove('absent');
-                } else {
-                    attendance[i] = true;
-                    daySquare.classList.add('absent');
-                }
-                localStorage.setItem(storageKey, JSON.stringify(attendance));
-                updateCounter(attendance);
-            };
-            calendar.appendChild(daySquare);
-        }
-        updateCounter(attendance);
+    try {
+      data = JSON.parse(localStorage.getItem(key)) || {};
+    } catch (e) {
+      data = {};
     }
 
-    function updateCounter(attendance) {
-        totalCountLabel.innerText = Object.keys(attendance).length;
+    // पुराने रिकॉर्ड को Biju की छुट्टी के रूप में सुरक्षित रखें
+    let changed = false;
+    Object.keys(data).forEach(day => {
+      if (data[day] === true) {
+        data[day] = { biju: 'absent', raju: '' };
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      localStorage.setItem(key, JSON.stringify(data));
     }
 
-    function changeMonth(step) {
-        currentDate.setMonth(currentDate.getMonth() + step);
-        renderCalendar();
-    }
+    return data;
+  }
 
-    function clearMonthData() {
-        if (confirm("Kya aap is mahine ka data delete karna chahte hain?")) {
-            const storageKey = `absent_${currentDate.getFullYear()}_${currentDate.getMonth()}`;
-            localStorage.removeItem(storageKey);
-            renderCalendar();
-        }
-    }
-
+  function saveAttendance(data) {
+    localStorage.setItem(getStorageKey(), JSON.stringify(data));
     renderCalendar();
+  }
+
+  function renderCalendar() {
+    calendar.innerHTML = '';
+
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    monthDisplay.innerText = currentDate.toLocaleDateString('en-US', {
+      month: 'long',
+      year: 'numeric'
+    });
+
+    dayNames.forEach(name => {
+      const div = document.createElement('div');
+      div.className = 'day-name';
+      div.innerText = name;
+      calendar.appendChild(div);
+    });
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const lastDay = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+      const empty = document.createElement('div');
+      empty.className = 'day empty';
+      calendar.appendChild(empty);
+    }
+
+    const attendance = getAttendance();
+    let totalAbsents = 0;
+
+    for (let day = 1; day <= lastDay; day++) {
+      const record = attendance[day] || {};
+      const biju = record.biju || '';
+      const raju = record.raju || '';
+
+      if (biju === 'absent') totalAbsents++;
+      if (raju === 'absent') totalAbsents++;
+
+      const div = document.createElement('div');
+      div.className = 'day';
+
+      if (biju === 'absent' || raju === 'absent') {
+        div.classList.add('absent');
+      } else if (biju === 'half' || raju === 'half') {
+        div.classList.add('half');
+      }
+
+      const number = document.createElement('div');
+      number.className = 'day-number';
+      number.innerText = day;
+      div.appendChild(number);
+
+      const status = document.createElement('div');
+      status.className = 'day-status';
+
+      const lines = [];
+      if (biju === 'absent') lines.push('Biju ❌');
+      if (biju === 'half') lines.push('Biju ½');
+      if (raju === 'absent') lines.push('Raju ❌');
+      if (raju === 'half') lines.push('Raju ½');
+
+      status.innerText = lines.join(' ');
+      div.appendChild(status);
+
+      div.onclick = () => editDay(day);
+      calendar.appendChild(div);
+    }
+
+    totalCountLabel.innerText = totalAbsents;
+  }
+
+  function editDay(day) {
+    const attendance = getAttendance();
+    const record = attendance[day] || {};
+
+    const choice = prompt(
+      `Date: ${day}\n\n` +
+      `1 = Biju Absent\n` +
+      `2 = Raju Absent\n` +
+      `3 = Both Absent\n` +
+      `4 = Biju Half Duty\n` +
+      `5 = Raju Half Duty\n` +
+      `6 = Clear Biju Status\n` +
+      `7 = Clear Raju Status\n` +
+      `8 = Clear Both (Present)\n\n` +
+      `अपना विकल्प नंबर लिखें:`
+    );
+
+    if (choice === null || choice.trim() === '') return;
+
+    if (choice === '1') {
+      record.biju = 'absent';
+    } else if (choice === '2') {
+      record.raju = 'absent';
+    } else if (choice === '3') {
+      record.biju = 'absent';
+      record.raju = 'absent';
+    } else if (choice === '4') {
+      record.biju = 'half';
+    } else if (choice === '5') {
+      record.raju = 'half';
+    } else if (choice === '6') {
+      record.biju = '';
+    } else if (choice === '7') {
+      record.raju = '';
+    } else if (choice === '8') {
+      record.biju = '';
+      record.raju = '';
+    } else {
+      alert('गलत विकल्प! 1 से 8 तक नंबर लिखें।');
+      return;
+    }
+
+    if (!record.biju && !record.raju) {
+      delete attendance[day];
+    } else {
+      attendance[day] = record;
+    }
+
+    saveAttendance(attendance);
+  }
+
+  function changeMonth(step) {
+    currentDate.setMonth(currentDate.getMonth() + step);
+    renderCalendar();
+  }
+
+  function clearMonthData() {
+    if (confirm('क्या आप इस महीने का पूरा attendance साफ करना चाहते हैं?')) {
+      localStorage.removeItem(getStorageKey());
+      renderCalendar();
+    }
+  }
+
+  renderCalendar();
 </script>
 
 </body>
